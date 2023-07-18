@@ -1,0 +1,58 @@
+- name: Check local configs for 'racoon'
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "files/{{ inventory_hostname }}/racoon"
+  register: ipsec_config_files
+
+- name: Custom configs of 'racoon'
+  ansible.builtin.copy:
+    src: files/{{ inventory_hostname }}/racoon/
+    dest: /etc/racoon
+    owner: root
+    group: sudo
+    mode: "0750"
+  when: ipsec_config_files.stat.exists
+  register: ipsec_config
+  notify:
+    - Chmod ipsec
+    - Restart ipsec
+
+- name: Config 'setkey' (for Rev.A)
+  ansible.builtin.copy:
+    src: files/{{ inventory_hostname }}/racoon/ipsec-tools.conf
+    dest: /etc/ipsec-tools.conf
+    owner: root
+    group: sudo
+    mode: "0640"
+  when: ipsec_rev == "A"
+  notify: Restart ipsec
+
+- name: Config 'setkey' (for Rev.B)
+  ansible.builtin.copy:
+    src: ipsec-tools.conf
+    dest: /etc/ipsec-tools.conf
+    owner: root
+    group: sudo
+    mode: "0640"
+  when: ipsec_rev == "B"
+  notify: Restart ipsec
+
+- name: Copy racoon.conf
+  ansible.builtin.copy:
+    src: racoon.conf
+    dest: /etc/racoon/racoon.conf
+    owner: root
+    group: sudo
+    mode: "0640"
+  notify: Restart ipsec
+
+# - name: Copy ipsec.conf
+#   ansible.builtin.copy:
+#     src: files/{{ inventory_hostname }}/racoon/
+#     dest: /etc/racoon
+#     owner: root
+#     group: sudo
+#     mode: "0750"
+#   notify:
+#     - Chown ipsec
+#     - Restart ipsec

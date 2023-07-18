@@ -1,0 +1,16 @@
+galaxy_info:
+  role_name: ipsec
+  namespace: johnpion
+  author: Ivan Serohin
+  license: license Apache-2.0
+  min_ansible_version: "2.9"
+  description: install ipsec (racoon or strongswan)
+
+  platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - wheezy
+        - stretch
+        - buster
+        - bullseye

@@ -1,0 +1,30 @@
+- name: StrongSWAN config
+  ansible.builtin.template:
+    src: "templates/{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: sudo
+    mode: "0640"
+  with_items:
+    - ipsec.conf
+    - ipsec.secrets
+  register: ipsec_config
+
+- name: Check local configs
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "files/{{ inventory_hostname }}/ipsec"
+  register: ipsec_config_files
+
+- name: StrongSWAN custom-config
+  ansible.builtin.copy:
+    src: files/{{ inventory_hostname }}/ipsec/
+    dest: /etc/ipsec.d
+    owner: root
+    group: sudo
+    mode: "0750"
+  when: ipsec_config_files.stat.exists
+  register: ipsec_config
+  notify:
+    - Chmod ipsec
+    - Restart ipsec

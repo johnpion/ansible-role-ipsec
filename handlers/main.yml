@@ -1,0 +1,48 @@
+- name: Chmod racoon
+  ansible.builtin.command: find /etc/racoon -type f -exec chmod -x {}+
+  listen: Chmod ipsec
+  tags: skip_ansible_lint
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version | int <= 9
+
+# - name: Chmod racoon psk
+#   ansible.builtin.file:
+#     path: /etc/racoon/psk.txt
+#     mode: "0600"
+#     owner: root
+#     group: root
+#   listen: Chmod ipsec
+#   when:
+#     - ansible_distribution == "Debian"
+#     - ansible_distribution_major_version <= "9"
+
+- name: Restart racoon
+  ansible.builtin.service:
+    name:
+      - racoon
+      - setkey
+    state: restarted
+    enabled: true
+  listen: Restart ipsec
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version | int <= 9
+
+- name: Restart strongswan
+  ansible.builtin.service:
+    name: strongswan
+    state: restarted
+    enabled: true
+  listen: Restart ipsec
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version | int >= 10
+
+- name: Chmod strongswan
+  ansible.builtin.command: find /etc/ipsec.d -type f -exec chmod -x {} \;
+  listen: Chmod ipsec
+  tags: skip_ansible_lint
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version | int >= 10

@@ -1,0 +1,7 @@
+- name: Install ipsec packages
+  ansible.builtin.include_tasks: install.yml
+  when: ipsec_enabled
+
+- name: Config ipsec
+  ansible.builtin.include_tasks: config.yml
+  when: ipsec_enabled

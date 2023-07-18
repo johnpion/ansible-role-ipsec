@@ -1,0 +1,11 @@
+- name: Config 'racoon'
+  ansible.builtin.include_tasks: config_racoon.yml
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version | int <= 9
+
+- name: Config 'strongswan'
+  ansible.builtin.include_tasks: config_strongswan.yml
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version | int >= 10
