@@ -31,7 +31,7 @@
 
 - name: Restart strongswan
   ansible.builtin.service:
-    name: strongswan
+    name: ipsec
     state: restarted
     enabled: true
   listen: Restart ipsec
